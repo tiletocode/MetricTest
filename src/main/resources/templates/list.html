@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>list</title>
+</head>
+<body>
+<table th:border="1">
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>time</th>
+        <th>count</th>
+    </tr>
+    <tbody>
+    <tr th:each="list: ${metricList}" th:object="${list}">
+        <td th:text="*{id}"></td>
+        <td th:text="*{#temporals.format(time, 'yy-MM-dd HH:mm')}"></td>
+        <!--    <td th:text="*{time}"></td>-->
+        <td th:text="*{count}" style="text-align: right"></td>
+    </tr>
+    </tbody>
+    </thead>
+</table>
+</body>
+</html>
