@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import java.io.File;
@@ -59,9 +62,11 @@ public class ClickCountController {
         throw new IOException("Manually triggered IOException");
     }
 
-    @GetMapping("/nullpointer")
-    public String triggerNullPointerException() throws NullPointerException {
-        throw new NullPointerException("NULL");
+    @ExceptionHandler(NullPointerException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  // 500 에러 상태 코드 설정
+    public String handleNullPointerException(NullPointerException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "error"; // error.html로 이동
     }
 
     @GetMapping("/illegalargument")
@@ -90,6 +95,7 @@ public class ClickCountController {
         }
         return "index";
     }
+
 
     /*
      * org.springframework.web.util.NestedServletException,
