@@ -44,7 +44,7 @@ public class SecondaryDatabaseConfig {
         config.setConnectionTimeout(connectionTimeout);
         config.setIdleTimeout(idleTimeout);
         config.setMaxLifetime(maxLifetime);
-        config.setRegisterMbeans(true);
+        config.setRegisterMbeans(false);
         config.setPoolName("SecondaryHikariPool");
 
         return new HikariDataSource(config);

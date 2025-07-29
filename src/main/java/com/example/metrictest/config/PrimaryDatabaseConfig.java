@@ -46,7 +46,7 @@ public class PrimaryDatabaseConfig {
         config.setConnectionTimeout(connectionTimeout);
         config.setIdleTimeout(idleTimeout);
         config.setMaxLifetime(maxLifetime);
-        config.setRegisterMbeans(true);
+        config.setRegisterMbeans(false);
         config.setPoolName("PrimaryHikariPool");
 
         return new HikariDataSource(config);

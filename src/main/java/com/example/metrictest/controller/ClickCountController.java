@@ -7,9 +7,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -68,5 +70,15 @@ public class ClickCountController {
         mav.addObject("metricList", metricList);
         mav.setViewName("list");
         return mav;
+    }
+
+    @GetMapping("/guid")
+    @ResponseBody
+    public String generateGuid() {
+        System.out.println("=== /guid endpoint called ===");
+        String guid = UUID.randomUUID().toString();
+        System.out.println("Generated GUID: " + guid);
+        System.out.println("=== GUID response sent ===");
+        return guid;
     }
 }
