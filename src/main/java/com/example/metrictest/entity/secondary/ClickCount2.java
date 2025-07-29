@@ -1,4 +1,4 @@
-package com.example.metrictest.entity;
+package com.example.metrictest.entity.secondary;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,23 +10,27 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-public class ClickCount {
+public class ClickCount2 {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-//    @DateTimeFormat(pattern="yy-MM-dd HH:mm")
     private LocalDateTime time;
 
     @Column
     private int count;
 
     @Builder
-    public ClickCount(Long id, LocalDateTime time, int count) {
+    public ClickCount2(Long id, LocalDateTime time, int count) {
         this.id = id;
         this.time = time;
         this.count = count;
+    }
+
+    // count를 1 증가시키는 메서드
+    public void incrementCount() {
+        this.count++;
     }
 }

@@ -1,22 +1,15 @@
 package com.example.metrictest.controller;
 
-import com.example.metrictest.entity.ClickCount;
-import com.example.metrictest.repository.ClickCountRepository;
+import com.example.metrictest.entity.primary.ClickCount;
+import com.example.metrictest.repository.primary.ClickCountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,17 +24,42 @@ public class ClickCountController {
 
     @PostMapping("/add")
     public String click() {
-        Long id = repository.findTop1ByOrderByIdDesc().getId();
-        LocalDateTime time = repository.findTop1ByOrderByIdDesc().getTime();
-        int count = repository.findTop1ByOrderByIdDesc().getCount();
+        System.out.println("=== /add endpoint called ===");
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            // 현재 시간을 분 단위로 truncate (초, 나노초 제거)
+            LocalDateTime currentMinute = now.truncatedTo(ChronoUnit.MINUTES);
+            System.out.println("Current minute: " + currentMinute);
 
-        ClickCount c = ClickCount.builder()
-                .id(id)
-                .time(time)
-                .count(count + 1).build();
+            // 현재 분에 해당하는 레코드가 있는지 확인
+            ClickCount existingRecord = repository.findByTime(currentMinute);
+            System.out.println("Existing record for current minute: " + existingRecord);
 
-        repository.save(c);
-        return "redirect:/";
+            if (existingRecord == null) {
+                // 현재 분에 대한 레코드가 없으면 새로 생성
+                System.out.println("Creating new record for minute: " + currentMinute);
+                ClickCount newRecord = ClickCount.builder()
+                        .time(currentMinute)
+                        .count(1)
+                        .build();
+                repository.save(newRecord);
+                System.out.println("New record created and saved: " + newRecord);
+            } else {
+                // 현재 분에 대한 레코드가 있으면 count만 증가
+                System.out
+                        .println("Incrementing count for existing record. Current count: " + existingRecord.getCount());
+                existingRecord.incrementCount(); // count를 1 증가시키는 메서드 필요
+                repository.save(existingRecord);
+                System.out.println("Count incremented and saved. New count: " + existingRecord.getCount());
+            }
+
+            System.out.println("Returning redirect:/");
+            return "redirect:/";
+        } catch (Exception e) {
+            System.err.println("=== Exception occurred in /add ===");
+            e.printStackTrace();
+            throw new RuntimeException("Error occurred while processing click: " + e.getMessage(), e);
+        }
     }
 
     @GetMapping("/list")
@@ -51,58 +69,4 @@ public class ClickCountController {
         mav.setViewName("list");
         return mav;
     }
-
-    @GetMapping("/404")
-    public String ex() throws IOException {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "status: 404");
-    }
-
-    @GetMapping("/ioexception")
-    public String triggerIOException() throws IOException {
-        throw new IOException("Manually triggered IOException");
-    }
-
-    @ExceptionHandler(NullPointerException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)  // 500 에러 상태 코드 설정
-    public String handleNullPointerException(NullPointerException ex, Model model) {
-        model.addAttribute("error", ex.getMessage());
-        return "error"; // error.html로 이동
-    }
-
-    @GetMapping("/illegalargument")
-    public String triggerIllegalArgumentException() {
-        throw new IllegalArgumentException("Invalid argument provided");
-    }
-
-    @GetMapping("/arithmetic")
-    public String triggerArithmeticException() {
-        int result = 10 / 0; // 여기서 ArithmeticException 발생
-        return "index";
-    }
-
-    @GetMapping("/indexoutofbounds")
-    public String triggerIndexOutOfBoundsException() {
-        int[] arr = new int[2];
-        int value = arr[5]; // 여기서 IndexOutOfBoundsException 발생
-        return "index";
-    }
-
-    @GetMapping("/filenotfound")
-    public String triggerFileNotFoundException() throws FileNotFoundException {
-        File file = new File("nonexistentfile.txt");
-        if (!file.exists()) {
-            throw new FileNotFoundException("File not found: nonexistentfile.txt");
-        }
-        return "index";
-    }
-
-
-    /*
-     * org.springframework.web.util.NestedServletException,
-     * org.apache.jasper.JasperException,
-     * org.springframework.web.HttpRequestMethodNotSupportedException,
-     * java.lang.NullPointerException,
-     * java.io.IOException
-     */
-
 }

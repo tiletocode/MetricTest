@@ -1,0 +1,94 @@
+{
+    "properties": [
+        {
+            "name": "spring.datasource.primary.jdbcUrl",
+            "type": "java.lang.String",
+            "description": "JDBC URL for primary database connection"
+        },
+        {
+            "name": "spring.datasource.primary.username",
+            "type": "java.lang.String",
+            "description": "Username for primary database connection"
+        },
+        {
+            "name": "spring.datasource.primary.password",
+            "type": "java.lang.String",
+            "description": "Password for primary database connection"
+        },
+        {
+            "name": "spring.datasource.primary.driverClassName",
+            "type": "java.lang.String",
+            "description": "Driver class name for primary database connection"
+        },
+        {
+            "name": "spring.datasource.primary.hikari.minimum-idle",
+            "type": "java.lang.Integer",
+            "description": "Minimum idle connections in primary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.primary.hikari.maximum-pool-size",
+            "type": "java.lang.Integer",
+            "description": "Maximum pool size for primary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.primary.hikari.connection-timeout",
+            "type": "java.lang.Long",
+            "description": "Connection timeout for primary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.primary.hikari.idle-timeout",
+            "type": "java.lang.Long",
+            "description": "Idle timeout for primary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.primary.hikari.max-lifetime",
+            "type": "java.lang.Long",
+            "description": "Maximum lifetime for primary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.secondary.jdbcUrl",
+            "type": "java.lang.String",
+            "description": "JDBC URL for secondary database connection"
+        },
+        {
+            "name": "spring.datasource.secondary.username",
+            "type": "java.lang.String",
+            "description": "Username for secondary database connection"
+        },
+        {
+            "name": "spring.datasource.secondary.password",
+            "type": "java.lang.String",
+            "description": "Password for secondary database connection"
+        },
+        {
+            "name": "spring.datasource.secondary.driverClassName",
+            "type": "java.lang.String",
+            "description": "Driver class name for secondary database connection"
+        },
+        {
+            "name": "spring.datasource.secondary.hikari.minimum-idle",
+            "type": "java.lang.Integer",
+            "description": "Minimum idle connections in secondary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.secondary.hikari.maximum-pool-size",
+            "type": "java.lang.Integer",
+            "description": "Maximum pool size for secondary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.secondary.hikari.connection-timeout",
+            "type": "java.lang.Long",
+            "description": "Connection timeout for secondary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.secondary.hikari.idle-timeout",
+            "type": "java.lang.Long",
+            "description": "Idle timeout for secondary HikariCP pool"
+        },
+        {
+            "name": "spring.datasource.secondary.hikari.max-lifetime",
+            "type": "java.lang.Long",
+            "description": "Maximum lifetime for secondary HikariCP pool"
+        }
+    ]
+}
