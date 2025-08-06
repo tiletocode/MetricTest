@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "click_count2")
 @Getter
 @NoArgsConstructor
 public class ClickCount2 {
