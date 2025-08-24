@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+import java.util.Random;
 
 @Controller
 @RequiredArgsConstructor
@@ -76,9 +77,45 @@ public class ClickCountController {
     @ResponseBody
     public String generateGuid() {
         System.out.println("=== /guid endpoint called ===");
+        try {
+            int randomSleepTime = 1000 + (int)(Math.random() * 4000); // 1000~5000ms
+            System.out.println("Sleeping for " + randomSleepTime + "ms");
+            Thread.sleep(randomSleepTime);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Thread interrupted during sleep: " + e.getMessage());
+        }
         String guid = UUID.randomUUID().toString();
+        getUserId();
+        getRemoteIp();
+        
         System.out.println("Generated GUID: " + guid);
         System.out.println("=== GUID response sent ===");
         return guid;
+    }
+
+ 
+    private String getUserId() {
+            String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        StringBuilder userId = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            int randomIndex = (int)(Math.random() * alphabet.length());
+            userId.append(alphabet.charAt(randomIndex));
+        }
+        String result = userId.toString();
+        System.out.println("Generated User Id: " + result);
+        return result;
+    }
+
+    private String getRemoteIp() {
+        // 임의의 IP 주소 생성 (1-255 범위)
+        int octet1 = 1 + (int)(Math.random() * 254); // 1-254
+        int octet2 = (int)(Math.random() * 256); // 0-255
+        int octet3 = (int)(Math.random() * 256); // 0-255
+        int octet4 = 1 + (int)(Math.random() * 254); // 1-254
+        
+        String ip = octet1 + "." + octet2 + "." + octet3 + "." + octet4;
+        System.out.println("Generated Remote Ip: " + ip);
+        return ip;
     }
 }
