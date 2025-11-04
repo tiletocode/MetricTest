@@ -3,10 +3,14 @@ package com.example.metrictest.controller;
 import com.example.metrictest.entity.primary.ClickCount;
 import com.example.metrictest.repository.primary.ClickCountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import java.time.LocalDateTime;
@@ -80,9 +84,16 @@ public class ClickCountController {
     }
 
     @GetMapping("/list")
-    public ModelAndView list(ModelAndView mav) {
-        Iterable<ClickCount> metricList = repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-        mav.addObject("metricList", metricList);
+    public ModelAndView list(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            ModelAndView mav) {
+        // 페이징 처리로 성능 개선
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<ClickCount> metricPage = repository.findAll(pageable);
+        
+        mav.addObject("metricPage", metricPage);
+        mav.addObject("metricList", metricPage.getContent());
         mav.setViewName("list");
         return mav;
     }

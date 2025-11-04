@@ -2,25 +2,149 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>list</title>
+    <title>Click Count List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .pagination a, .pagination span {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #333;
+            border-radius: 4px;
+        }
+        .pagination a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .pagination .current {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        .pagination .disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        .info {
+            text-align: center;
+            margin: 10px 0;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-<table th:border="1">
-    <thead>
-    <tr>
-        <th>id</th>
-        <th>time</th>
-        <th>count</th>
-    </tr>
-    <tbody>
-    <tr th:each="list: ${metricList}" th:object="${list}">
-        <td th:text="*{id}"></td>
-        <td th:text="*{#temporals.format(time, 'yy-MM-dd HH:mm')}"></td>
-        <!--    <td th:text="*{time}"></td>-->
-        <td th:text="*{count}" style="text-align: right"></td>
-    </tr>
-    </tbody>
-    </thead>
-</table>
+    <h1>Click Count List</h1>
+    
+    <div class="info">
+        <p>Total Records: <strong th:text="${metricPage.totalElements}">0</strong> | 
+           Page <strong th:text="${metricPage.number + 1}">1</strong> of <strong th:text="${metricPage.totalPages}">1</strong>
+        </p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Time</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="list: ${metricList}" th:object="${list}">
+                <td th:text="*{id}"></td>
+                <td th:text="*{#temporals.format(time, 'yy-MM-dd HH:mm')}"></td>
+                <td th:text="*{count}" style="text-align: right"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <!-- First Page -->
+        <a th:if="${metricPage.number > 0}" 
+           th:href="@{/list(page=0, size=${metricPage.size})}">
+            ⏮ First
+        </a>
+        <span th:if="${metricPage.number == 0}" class="disabled">⏮ First</span>
+
+        <!-- Previous Page -->
+        <a th:if="${metricPage.hasPrevious()}" 
+           th:href="@{/list(page=${metricPage.number - 1}, size=${metricPage.size})}">
+            ◀ Previous
+        </a>
+        <span th:if="${!metricPage.hasPrevious()}" class="disabled">◀ Previous</span>
+
+        <!-- Page Numbers -->
+        <th:block th:each="i : ${#numbers.sequence(0, metricPage.totalPages - 1)}">
+            <!-- Show pages around current page -->
+            <a th:if="${i >= metricPage.number - 2 && i <= metricPage.number + 2 && i != metricPage.number}" 
+               th:href="@{/list(page=${i}, size=${metricPage.size})}" 
+               th:text="${i + 1}">1</a>
+            <span th:if="${i == metricPage.number}" 
+                  class="current" 
+                  th:text="${i + 1}">1</span>
+        </th:block>
+
+        <!-- Next Page -->
+        <a th:if="${metricPage.hasNext()}" 
+           th:href="@{/list(page=${metricPage.number + 1}, size=${metricPage.size})}">
+            Next ▶
+        </a>
+        <span th:if="${!metricPage.hasNext()}" class="disabled">Next ▶</span>
+
+        <!-- Last Page -->
+        <a th:if="${metricPage.number < metricPage.totalPages - 1}" 
+           th:href="@{/list(page=${metricPage.totalPages - 1}, size=${metricPage.size})}">
+            Last ⏭
+        </a>
+        <span th:if="${metricPage.number == metricPage.totalPages - 1}" class="disabled">Last ⏭</span>
+    </div>
+
+    <div class="info">
+        <form method="get" action="/list" style="display: inline-block;">
+            <label>Page Size: 
+                <select name="size" onchange="this.form.submit()">
+                    <option th:value="10" th:selected="${metricPage.size == 10}">10</option>
+                    <option th:value="20" th:selected="${metricPage.size == 20}">20</option>
+                    <option th:value="50" th:selected="${metricPage.size == 50}">50</option>
+                    <option th:value="100" th:selected="${metricPage.size == 100}">100</option>
+                </select>
+            </label>
+            <input type="hidden" name="page" value="0">
+        </form>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="/" style="padding: 10px 20px; background-color: #008CBA; color: white; text-decoration: none; border-radius: 4px;">
+            ← Back to Home
+        </a>
+    </div>
 </body>
 </html>

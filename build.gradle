@@ -8,6 +8,14 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
+// Gradle 빌드 경고 억제
+gradle.taskGraph.whenReady {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << '-Xlint:none'
+        options.warnings = false
+    }
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor

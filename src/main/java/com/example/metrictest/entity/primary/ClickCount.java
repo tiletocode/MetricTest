@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(indexes = {
+    @Index(name = "idx_id_desc", columnList = "id DESC"),
+    @Index(name = "idx_time", columnList = "time")
+})
 public class ClickCount {
 
     @Id
