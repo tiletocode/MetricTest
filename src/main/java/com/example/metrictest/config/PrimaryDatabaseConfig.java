@@ -54,6 +54,7 @@ public class PrimaryDatabaseConfig {
 
     @Primary
     @Bean(name = "primaryEntityManagerFactory")
+    @SuppressWarnings("null")
     public LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory(
             @Qualifier("primaryDataSource") DataSource dataSource) {
 
@@ -76,6 +77,7 @@ public class PrimaryDatabaseConfig {
 
     @Primary
     @Bean(name = "primaryTransactionManager")
+    @SuppressWarnings("null")
     public PlatformTransactionManager primaryTransactionManager(
             @Qualifier("primaryEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);

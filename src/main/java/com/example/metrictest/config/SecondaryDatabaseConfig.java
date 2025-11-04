@@ -51,6 +51,7 @@ public class SecondaryDatabaseConfig {
     }
 
     @Bean(name = "secondaryEntityManagerFactory")
+    @SuppressWarnings("null")
     public LocalContainerEntityManagerFactoryBean secondaryEntityManagerFactory(
             @Qualifier("secondaryDataSource") DataSource dataSource) {
 
@@ -72,6 +73,7 @@ public class SecondaryDatabaseConfig {
     }
 
     @Bean(name = "secondaryTransactionManager")
+    @SuppressWarnings("null")
     public PlatformTransactionManager secondaryTransactionManager(
             @Qualifier("secondaryEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
