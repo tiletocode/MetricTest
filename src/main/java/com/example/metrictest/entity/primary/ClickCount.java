@@ -24,7 +24,7 @@ public class ClickCount {
     private int count;
 
     @Builder
-    public ClickCount(Long id, LocalDateTime time, int count) {
+    public ClickCount(Long id, @lombok.NonNull LocalDateTime time, int count) {
         this.id = id;
         this.time = time;
         this.count = count;

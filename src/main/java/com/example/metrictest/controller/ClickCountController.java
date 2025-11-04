@@ -50,8 +50,9 @@ public class ClickCountController {
                             .time(fiveMinuteSlot)
                             .count(1)
                             .build();
-                    repository.save(newRecord);
-                    System.out.println("New record created and saved: " + newRecord);
+                    @SuppressWarnings("null")
+                    ClickCount saved = repository.save(newRecord);
+                    System.out.println("New record created and saved: " + saved);
                 } catch (org.springframework.dao.DataIntegrityViolationException e) {
                     // 동시 삽입으로 인한 UNIQUE 제약조건 위반 - 레코드가 이미 존재함
                     System.out.println("Record already exists due to concurrent insert, incrementing count");
