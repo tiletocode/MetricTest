@@ -25,34 +25,48 @@ public class ClickCountController {
     }
 
     @PostMapping("/add")
+    @org.springframework.transaction.annotation.Transactional
     public String click() {
         System.out.println("=== /add endpoint called ===");
         try {
             LocalDateTime now = LocalDateTime.now();
-            // 현재 시간을 분 단위로 truncate (초, 나노초 제거)
-            LocalDateTime currentMinute = now.truncatedTo(ChronoUnit.MINUTES);
-            System.out.println("Current minute: " + currentMinute);
+            // 현재 시간을 5분 단위로 그룹화 (초, 나노초 제거)
+            LocalDateTime truncatedToMinute = now.truncatedTo(ChronoUnit.MINUTES);
+            int minute = truncatedToMinute.getMinute();
+            int groupedMinute = (minute / 5) * 5; // 0, 5, 10, 15, ... 55
+            LocalDateTime fiveMinuteSlot = truncatedToMinute.withMinute(groupedMinute);
+            
+            System.out.println("Current time: " + now);
+            System.out.println("5-minute slot: " + fiveMinuteSlot);
 
-            // 현재 분에 해당하는 레코드가 있는지 확인
-            ClickCount existingRecord = repository.findByTime(currentMinute);
-            System.out.println("Existing record for current minute: " + existingRecord);
-
-            if (existingRecord == null) {
-                // 현재 분에 대한 레코드가 없으면 새로 생성
-                System.out.println("Creating new record for minute: " + currentMinute);
-                ClickCount newRecord = ClickCount.builder()
-                        .time(currentMinute)
-                        .count(1)
-                        .build();
-                repository.save(newRecord);
-                System.out.println("New record created and saved: " + newRecord);
+            // 비관적 락을 사용하여 5분 단위 시간에 해당하는 레코드 조회
+            java.util.Optional<ClickCount> existingRecord = repository.findByTime(fiveMinuteSlot);
+            
+            if (!existingRecord.isPresent()) {
+                // 해당 5분 단위에 대한 레코드가 없으면 새로 생성
+                System.out.println("Creating new record for 5-minute slot: " + fiveMinuteSlot);
+                try {
+                    ClickCount newRecord = ClickCount.builder()
+                            .time(fiveMinuteSlot)
+                            .count(1)
+                            .build();
+                    repository.save(newRecord);
+                    System.out.println("New record created and saved: " + newRecord);
+                } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                    // 동시 삽입으로 인한 UNIQUE 제약조건 위반 - 레코드가 이미 존재함
+                    System.out.println("Record already exists due to concurrent insert, incrementing count");
+                    // 다시 조회해서 카운트 증가
+                    ClickCount record = repository.findByTime(fiveMinuteSlot).orElseThrow();
+                    record.incrementCount();
+                    repository.save(record);
+                }
             } else {
-                // 현재 분에 대한 레코드가 있으면 count만 증가
-                System.out
-                        .println("Incrementing count for existing record. Current count: " + existingRecord.getCount());
-                existingRecord.incrementCount(); // count를 1 증가시키는 메서드 필요
-                repository.save(existingRecord);
-                System.out.println("Count incremented and saved. New count: " + existingRecord.getCount());
+                // 해당 5분 단위에 대한 레코드가 있으면 count만 증가
+                ClickCount record = existingRecord.get();
+                System.out.println("Incrementing count for existing record. Current count: " + record.getCount());
+                record.incrementCount();
+                repository.save(record);
+                System.out.println("Count incremented and saved. New count: " + record.getCount());
             }
 
             System.out.println("Returning redirect:/");
@@ -76,9 +90,46 @@ public class ClickCountController {
     @ResponseBody
     public String generateGuid() {
         System.out.println("=== /guid endpoint called ===");
+        try {
+            int randomSleepTime = 1000 + (int)(Math.random() * 4000); // 1000~5000ms
+            System.out.println("Sleeping for " + randomSleepTime + "ms");
+            Thread.sleep(randomSleepTime);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Thread interrupted during sleep: " + e.getMessage());
+        }
         String guid = UUID.randomUUID().toString();
+        getUserId();
+        getRemoteIp();
+        
         System.out.println("Generated GUID: " + guid);
         System.out.println("=== GUID response sent ===");
         return guid;
     }
+
+ 
+    private String getUserId() {
+            String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        StringBuilder userId = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            int randomIndex = (int)(Math.random() * alphabet.length());
+            userId.append(alphabet.charAt(randomIndex));
+        }
+        String result = userId.toString();
+        System.out.println("Generated User Id: " + result);
+        return result;
+    }
+
+    private String getRemoteIp() {
+        // 임의의 IP 주소 생성 (1-255 범위)
+        int octet1 = 1 + (int)(Math.random() * 254); // 1-254
+        int octet2 = (int)(Math.random() * 256); // 0-255
+        int octet3 = (int)(Math.random() * 256); // 0-255
+        int octet4 = 1 + (int)(Math.random() * 254); // 1-254
+        
+        String ip = octet1 + "." + octet2 + "." + octet3 + "." + octet4;
+        System.out.println("Generated Remote Ip: " + ip);
+        return ip;
+    }
+
 }

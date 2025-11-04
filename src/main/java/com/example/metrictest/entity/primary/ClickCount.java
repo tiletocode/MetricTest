@@ -16,7 +16,7 @@ public class ClickCount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
     // @DateTimeFormat(pattern="yy-MM-dd HH:mm")
     private LocalDateTime time;
 
