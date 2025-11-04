@@ -131,5 +131,4 @@ public class ClickCountController {
         System.out.println("Generated Remote Ip: " + ip);
         return ip;
     }
-
 }
