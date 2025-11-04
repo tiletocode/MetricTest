@@ -26,6 +26,7 @@ public class ClickCount2Controller {
     }
 
     @PostMapping("/count")
+    @SuppressWarnings("null")
     public String count() {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         ClickCount2 existingRecord = repository.findByTime(now);
